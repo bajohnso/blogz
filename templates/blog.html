@@ -1,5 +1,15 @@
-{% extends base.html %}
+{% extends 'base.html' %}
 
 {% block content %}
-    This is the blog.
+
+{% for blog in blogs %}
+    <p>
+    <a href='/blog?id={{blog.id}}' name='id'>{{blog.title}}</a>
+        <br><br>
+        {{blog.post}}
+    </p>
+{% endfor %}
+
+
+    
 {% endblock %}

@@ -1,1 +1,10 @@
-{% extends base.html %}
+{% extends 'base.html' %}
+
+
+{% block content %}
+<p>
+    <a href='/post'>{{blog.title}}</a>
+    <br><br>
+    {{blog.post}}
+</p>
+{% endblock %}

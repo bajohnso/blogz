@@ -4,10 +4,19 @@
         <title>yo blog</title>
     </head>
 
+    {% with messages = get_flashed_messages() %}
+
     <body>
-        <nav> FILL THIS IN </nav>
+        <nav>
+            <a href='/blog'> Main Blog </a> 
+            <br><br>
+            <a href='/newpost'> Make a New Entry </a>
+        </nav>
+        
+        <br><br><br><br>
+
         {% block content %}
         {% endblock %}
     </body>
-
+    {% endwith %}
 </html>
