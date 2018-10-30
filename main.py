@@ -1,37 +1,9 @@
 from flask import Flask, request, redirect, render_template, flash, session
-from flask_sqlalchemy import SQLAlchemy
-from hashutils import make_pw_hash, check_pw_hash
-
-app = Flask(__name__)
-app.config['DEBUG'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:bloggit@localhost:8889/blogz'
-app.config['SQLALCHEMY_ECHO'] = True
-db = SQLAlchemy(app)
-app.secret_key = '_5y2L"F4Q8z-n-xec]/'
-
-class Blog(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100))
-    post = db.Column(db.String(1000))
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
-    def __init__(self,title,post,owner):
-        self.title = title
-        self.post = post
-        self.owner = owner
-
-class User(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(25))
-    pw_hash = db.Column(db.String(120))
-    blogs = db.relationship('Blog', backref='owner')
-
-    def __init__(self, username, password):
-        self.username = username
-        self.pw_hash = make_pw_hash(password)
-
+import cgi
+from app import app, db
+#from flask_sqlalchemy import SQLAlchemy
+from hashutils import check_pw_hash
+from models import User, Blog
 
 allowed_routes = ['index', 'login', 'signup', 'blogview', 'logout']
 
@@ -186,6 +158,7 @@ def index():
     users = User.query.all()
     return render_template('index.html', users=users)
 
+app.secret_key = '_5y2L"F4Q8z-n-xec]/'
 
 if __name__ == "__main__":
     app.run()   

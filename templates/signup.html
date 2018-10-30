@@ -12,12 +12,15 @@
     <form action='/signup' method='post'>
     <label> Username </label>
     <input type='text' name='username'>
+    {{u_error}}
     
     <label> Password </label>
     <input type='password' name='password'>
+    {{p_error}}
 
     <label> Verify Password </label>
     <input type='password' name='verify'>
+    {{v_error}}
 
     <input type='submit'>
 {% endblock %}
