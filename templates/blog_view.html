@@ -4,12 +4,10 @@
 
 {% for blog in blogs %}
     <p>
-    <a href='/blog?id={{blog.id}}' name='id'>{{blog.title}}</a>
+    <a href='/blog?id={{blog.id}}' name='blog_id'>{{blog.title}}</a>
         <br><br>
-        {{blog.post}}
+     {{blog.post}}
     </p>
 {% endfor %}
-
-
     
 {% endblock %}

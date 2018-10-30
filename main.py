@@ -7,7 +7,7 @@ app.config['DEBUG'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:bloggit@localhost:8889/blogz'
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
-app.secret_key = '_5#y2L"F4Q8z\n\xec]/'
+app.secret_key = '_5y2L"F4Q8z-n-xec]/'
 
 class Blog(db.Model):
 
@@ -25,7 +25,7 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(25))
-    pw_hash = db.Column(db.String(20))
+    pw_hash = db.Column(db.String(120))
     blogs = db.relationship('Blog', backref='owner')
 
     def __init__(self, username, password):
@@ -33,35 +33,57 @@ class User(db.Model):
         self.pw_hash = make_pw_hash(password)
 
 
+allowed_routes = ['index', 'login', 'signup', 'blogview', 'logout']
+
 @app.before_request
 def require_login():
-    allowed_routes = ['index', 'login', 'signup', 'blog']
-    if request.endpoint not in allowed_routes and 'username' not in session:
+    if not 'username' in session and not request.endpoint in allowed_routes: 
         return redirect('/login')
 
 
-@app.route('/')
-def index():
-    query = request.args.get('username')
-    if not query:    
-        users = User.query.all()
-        return render_template('index.html', users=users)
-    else:
-        blogs = Blog.query.filter_by(owner_id=id).first()
-        return render_template('blog.html', blogs=blogs)
+def valid_user(user):
+    if len(user) < 3 or len(user) > 20:
+        return False   
+    elif ' ' in user:
+        return False
+    else: 
+        return True
 
-        
+def valid_pw(pw):
+    if len(pw) < 3 or len(pw) > 20:
+        return False   
+    elif ' ' in pw:
+        return False
+    else: 
+        return True
+
+def valid_verify(pw, verify):
+    if pw == verify:
+        return True
+    else:
+        return False
+
+def validate_signup(username, pw, verify):
+    if valid_user(username) and valid_pw(pw) and valid_verify(pw, verify):
+        return True
+    else:
+        return False
+
+
 @app.route('/blog')
-def blog():
-    query = request.args.get('id')
+def blogview():
+    username = request.args.get('user')
+    blog_id = request.args.get('id')
+    owner = User.query.filter_by(username=username).first()
     
-    if not query:
-        blogs = Blog.query.all()
-        return render_template('blog.html', blogs=blogs)
 
+    if owner:
+        blogs = Blog.query.filter_by(owner_id=owner.id).all()
+        return render_template('blog_view.html', blogs=blogs)
     else:
-        blog = Blog.query.filter_by(id=query).first()
+        blog = Blog.query.filter_by(id=blog_id).first()
         return render_template('singlepost.html', blog=blog)
+   
 
 @app.route('/newpost', methods=['POST', 'GET'])
 def new_post():
@@ -71,7 +93,8 @@ def new_post():
     else:
         blog_title = request.form['title']
         blog_post = request.form['post']
-        owner_id = User.id
+        owner_id = User.query.filter_by(username=session['username']).first()
+
         if blog_title == "" or blog_post == "":
             flash('Please enter something in each field.')
             return render_template('newpost.html', post=blog_post, title=blog_title)
@@ -86,6 +109,7 @@ def new_post():
 
             return render_template('singlepost.html', blog=blog)
 
+
 @app.route('/login', methods=['GET','POST'])
 def login():    
     if request.method == 'GET':
@@ -95,7 +119,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
-
+        
         if user and check_pw_hash(password, user.pw_hash):
             session['username'] = username
             return redirect('/newpost')
@@ -109,6 +133,7 @@ def login():
             flash('Username and password are incorrect.')
             return redirect('/login')
 
+
 @app.route('/signup', methods=['GET','POST'])
 def signup():   
     if request.method == 'GET':
@@ -118,29 +143,48 @@ def signup():
         username = request.form['username']
         password = request.form['password']
         verify = request.form['verify']
-
-        # VERIFY INPUTS.
-
+        valid = validate_signup(username, password, verify)
         known_user = User.query.filter_by(username=username).first()
-
-        if not known_user:
+         
+        if valid and not known_user:
             new_user = User(username, password)
             db.session.add(new_user)
             db.session.commit()
             session['username'] = username
-            #flash('New account created.')
+            flash('New account created.')
             return redirect('/newpost')
+
+        elif known_user:
+            flash('Username already exists.')    
+            return render_template('signup.html')
+
+        elif not valid_user(username):
+            flash('Username not valid. Should be 3-20 characters w/ no spaces.')
+            return render_template('signup.html')
+
+        elif not valid_pw(password):
+            flash('Password not valid. Should be 3-20 characters w/ no spaces.')
+            return render_template('signup.html')
+
         else:
-            return ('Username already exists.')
+            flash("Passwords don't match.")
+            return render_template('signup.html')
+
 
 @app.route('/logout')
 def logout():
     if not session:
-        return ('Not logged in.')
+        flash('Not logged in.')
+        return redirect('/')
     else: 
         del session['username']
-        return redirect('/blog')
+        return redirect('/')
 
+
+@app.route('/')
+def index():
+    users = User.query.all()
+    return render_template('index.html', users=users)
 
 
 if __name__ == "__main__":

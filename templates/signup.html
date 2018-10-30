@@ -1,5 +1,13 @@
 {% extends 'base.html' %}
 
+{% with messages = get_flashed_messages() %}
+    <ul>
+    {% for message in messages %}
+        <li>{{message}}</li>
+    {% endfor %}
+    </ul>
+{% endwith %}
+
 {% block content %}
     <form action='/signup' method='post'>
     <label> Username </label>
