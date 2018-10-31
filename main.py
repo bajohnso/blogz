@@ -5,7 +5,7 @@ from app import app, db
 from hashutils import check_pw_hash
 from models import User, Blog
 
-allowed_routes = ['index', 'login', 'signup', 'blogview', 'logout']
+allowed_routes = ['index', 'login', 'signup', 'blogview', 'logout', 'all_posts']
 
 @app.before_request
 def require_login():
@@ -35,7 +35,7 @@ def valid_verify(pw, verify):
     else:
         return False
 
-def validate_signup(username, pw, verify):
+def validate_signup(username, pw, verify=None):
     if valid_user(username) and valid_pw(pw) and valid_verify(pw, verify):
         return True
     else:
@@ -46,6 +46,7 @@ def validate_signup(username, pw, verify):
 def blogview():
     username = request.args.get('user')
     blog_id = request.args.get('id')
+    user = User.query.filter_by(username=username)
     owner = User.query.filter_by(username=username).first()
     
 
@@ -81,26 +82,39 @@ def new_post():
 
             return render_template('singlepost.html', blog=blog)
 
+@app.route('/allposts', methods=['GET'])
+def all_posts():
+    
+    blogs = Blog.query.all()
+    owner_id = request.args.get('id')
+    user =  User.query.filter_by()
+    return render_template('all_posts.html', blogs=blogs)
+    
 
 @app.route('/login', methods=['GET','POST'])
 def login():    
     if request.method == 'GET':
         return render_template('login.html')
-    
+
     else:
         username = request.form['username']
         password = request.form['password']
+        valid = validate_signup(username, password)
         user = User.query.filter_by(username=username).first()
         
         if user and check_pw_hash(password, user.pw_hash):
             session['username'] = username
             return redirect('/newpost')
+
+        elif not valid:
+            flash('Username and password are incorrect.')
+            return redirect('/login')
         elif user and not check_pw_hash(password, user.pw_hash):
             flash('Password is incorrect.')
             return redirect('/login')
         elif not user and check_pw_hash(password,user.pw_hash):
             flash('Username does not exist.')
-            return redirect('/login')
+            return redirect('/login' )
         else:
             flash('Username and password are incorrect.')
             return redirect('/login')

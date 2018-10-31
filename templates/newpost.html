@@ -9,7 +9,7 @@
     {% endfor %}
     </ul>
 {% endwith %}
-
+<div class='content form'></div>
     <form action='/newpost' method='post'>
         <label>
             Title:<br>
@@ -20,12 +20,12 @@
     
         <label>
             Enter new post here:<br>
-            <textarea name='post' value='{{post}}'></textarea>
+            <textarea name='post' value='{{post}}' class='newpost'></textarea>
         
-        </label>
-            <input type='submit' value='Make blog post'> 
+        <input type='submit' value='Make blog post' class='submit'/> 
             
     </form>
+</div>
 
 
 {% endblock %}

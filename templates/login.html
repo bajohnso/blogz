@@ -1,15 +1,25 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <form action='/login' method='post'>
+
+{% with messages = get_flashed_messages() %}
+    <ul>
+    {% for message in messages %}
+        <li>{{message}}</li>
+    {% endfor %}
+    </ul>
+{% endwith %}
+
+<div class='content form'>
+<form action='/login' method='post'>
         <label> Username </label>
         <input type='text' name='username'>
         
         <label> Password </label>
         <input type='password' name='password'>
 
-        <input type='submit'>
+        <input type='submit' class='submit'>
 
-        Create an account <a href='/signup'> here! </a>
+        <span class='signup'></span>Don't have an account? Create one <a href='/signup' class='signuplink'> here! </a></span>
     </form>
 {% endblock %}

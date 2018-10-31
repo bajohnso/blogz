@@ -2,16 +2,18 @@
 
 {% block content %}
 {% with messages = get_flashed_messages() %}
+
     <ul>
-    {% for message in messages %}
+        {% for message in messages %}
         <li>{{message}}</li>
-    {% endfor %}
+        {% endfor %}
     </ul>
 {% endwith %}
 
+<div class='content' ></div>
     <ul>
         {% for user in users %}
-        <a href='/blog?user={{user.username}}'><li name='user'>
+        <a href='/blog?user={{user.username}}'><li name='user' class='user'>
             {{user.username}} 
         </li></a> 
         {% endfor %}
