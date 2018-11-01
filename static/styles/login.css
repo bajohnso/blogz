@@ -1,19 +1,9 @@
-  textarea {
-    width: 295px;
-    height: 300px;
-    margin:20px 10px 20px 80px;
-    
-   
-  }
-
-.signuplink {
-    padding: 10px 80px 0px 0px;
-    margin: 20px 20px 20px 80px;
-    font-family: 'Verdana' ;
-    font-size: 15px;
-    color: #7F8C8D;
-}
-
 .signup {
-    color: #1ABC9C; 
-}
+    font-family: Verdana;
+    margin-left: 80px;
+  }
+  
+  .signuplink {
+    color: red; 
+    text-decoration-style: wavy !important;
+  }

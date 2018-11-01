@@ -11,15 +11,20 @@
 {% endwith %}
 
 <div class='content form'>
-<form action='/login' method='post'>
-        <label> Username </label>
-        <input type='text' name='username'>
-        
-        <label> Password </label>
-        <input type='password' name='password'>
-
-        <input type='submit' class='submit'>
-
-        <span class='signup'></span>Don't have an account? Create one <a href='/signup' class='signuplink'> here! </a></span>
+    <form action='/login' method='post'>
+       <label> Username </label>
+       <input type='text' name='username'>
+ 
+       <label> Password </label>
+       <input type='password' name='password'>
+ 
+       <input type='submit' class='submit'>
     </form>
+</div>
+
+<div class='signup'>
+    Don't have an account? Create one <a href='/signup' class='signuplink'> here! </a>
+</div>   
+ 
+ 
 {% endblock %}
